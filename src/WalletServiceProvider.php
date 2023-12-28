@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Centrex\Wallet;
 
@@ -21,7 +21,7 @@ class WalletServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('laravel-wallet.php'),
+                __DIR__ . '/../config/config.php' => config_path('laravel-wallet.php'),
             ], 'laravel-wallet-config');
 
             // Publishing the migrations.
@@ -53,11 +53,11 @@ class WalletServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'laravel-wallet');
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'laravel-wallet');
 
         // Register the main class to use with the facade
         $this->app->singleton('laravel-wallet', function () {
-            return new Wallet;
+            return new Wallet();
         });
     }
 }
