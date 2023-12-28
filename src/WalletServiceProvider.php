@@ -16,12 +16,12 @@ class WalletServiceProvider extends ServiceProvider
          */
         // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-wallet');
         // $this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-wallet');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         // $this->loadRoutesFrom(__DIR__.'/routes.php');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/config.php' => config_path('laravel-wallet.php'),
+                __DIR__ . '/../config/config.php' => config_path('wallet.php'),
             ], 'laravel-wallet-config');
 
             // Publishing the migrations.
@@ -53,10 +53,10 @@ class WalletServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'laravel-wallet');
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'wallet');
 
         // Register the main class to use with the facade
-        $this->app->singleton('laravel-wallet', function () {
+        $this->app->singleton('wallet', function () {
             return new Wallet();
         });
     }

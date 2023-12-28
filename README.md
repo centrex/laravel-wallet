@@ -70,6 +70,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 - [centrex](https://github.com/centrex)
 - [All Contributors](../../contributors)
+- [CoreProc/laravel-wallet-plus](https://github.com/CoreProc/laravel-wallet-plus)
 
 ## License
 
