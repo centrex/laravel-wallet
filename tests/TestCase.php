@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Centrex\Wallet\Tests;
 
+use Centrex\Wallet\WalletServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Centrex\Wallet\WalletServiceProvider;
 
 class TestCase extends Orchestra
 {
