@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @see \Centrex\Wallet\Wallet
  */
-class Wallet extends Facade
+final class Wallet extends Facade
 {
     protected static function getFacadeAccessor()
     {

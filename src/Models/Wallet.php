@@ -51,11 +51,10 @@ final class Wallet extends Model
 
     /**
      * @param $transaction WalletTransaction|integer|float|double
-     * @return Wallet
      *
      * @throws Exception
      */
-    public function incrementBalance($transaction)
+    public function incrementBalance($transaction): self
     {
         if (is_numeric($transaction)) {
             $amount = $this->convertToWalletTypeInteger($transaction);
@@ -79,11 +78,10 @@ final class Wallet extends Model
 
     /**
      * @param $transaction WalletTransaction|integer|float|double
-     * @return Wallet
      *
      * @throws Exception
      */
-    public function decrementBalance($transaction)
+    public function decrementBalance($transaction): self
     {
         if (is_numeric($transaction)) {
             $amount = $this->convertToWalletTypeInteger($transaction);
@@ -106,12 +104,11 @@ final class Wallet extends Model
     }
 
     /**
-     * @param string $type
      * @return mixed
      *
      * @throws Exception
      */
-    private function createWalletLedgerEntry($transaction, $newRunningRawBalance, $type = 'increment')
+    private function createWalletLedgerEntry($transaction, $newRunningRawBalance, string $type = 'increment')
     {
         if (is_numeric($transaction)) {
             if ($type === 'decrement') {
@@ -126,8 +123,7 @@ final class Wallet extends Model
         }
 
         if (!$transaction instanceof WalletTransaction) {
-            throw new Exception('Wallet ledger entries expect first parameter to be numeric or a WalletTransaction ' .
-                'instance');
+            throw new Exception('Wallet ledger entries expect first parameter to be numeric or a WalletTransaction instance');
         }
 
         $amount = $this->convertToWalletTypeInteger($transaction->getAmount());
@@ -139,7 +135,7 @@ final class Wallet extends Model
         return WalletLedger::query()->create([
             'wallet_id'           => $this->id,
             'transaction_id'      => $transaction->id,
-            'transaction_type'    => get_class($transaction),
+            'transaction_type'    => $transaction::class,
             'amount'              => $amount,
             'running_raw_balance' => $newRunningRawBalance,
         ]);
@@ -157,6 +153,6 @@ final class Wallet extends Model
             return $value;
         }
 
-        return (int) ($value * pow(10, $this->walletType->decimals));
+        return (int) ($value * 10 ** $this->walletType->decimals);
     }
 }

@@ -8,14 +8,14 @@ use Centrex\Wallet\WalletServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
 
-class TestCase extends Orchestra
+final class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Centrex\\Wallet\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+            fn (string $modelName): string => 'Centrex\\Wallet\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
         );
     }
 
@@ -26,7 +26,7 @@ class TestCase extends Orchestra
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
 

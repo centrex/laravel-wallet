@@ -16,7 +16,7 @@ trait HasWallet
         });
 
         static::created(function (Model $model): void {
-            Wallet::create(['user_id' => $model->user_id, 'user_type' => get_class($model)]);
+            Wallet::create(['user_id' => $model->user_id, 'user_type' => $model::class]);
         });
     }
 

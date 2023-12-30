@@ -6,7 +6,7 @@ namespace Centrex\Wallet\Commands;
 
 use Illuminate\Console\Command;
 
-class WalletCommand extends Command
+final class WalletCommand extends Command
 {
     public $signature = 'laravel-wallet';
 
