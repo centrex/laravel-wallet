@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 use Centrex\Wallet\Models\Wallet;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
