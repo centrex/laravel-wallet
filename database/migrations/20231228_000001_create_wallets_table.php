@@ -21,6 +21,7 @@ return new class() extends Migration
             $table->decimal('balance', 12, 4)->default(0.00);
             $table->tinyInteger('wallet_type_id')->default(1);
             $table->nullableMorphs('user');
+            $table->string('currency_code', 3)->default('BDT');
 
             $table->timestamps();
             $table->softDeletes();
