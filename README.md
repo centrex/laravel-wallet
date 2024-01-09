@@ -7,6 +7,16 @@
 
 Easily add a virtual wallet to your Laravel models. Features multiple wallets and a ledger system to help keep track of all transactions in the wallets.
 
+## Contents
+
+- [Installation](#installation)
+- [Usage Examples](#usage)
+- [Testing](#testing)
+- [Changelog](#changelog)
+- [Contributing](#contributing)
+- [Credits](#credits)
+- [License](#license)
+
 ## Installation
 
 You can install the package via composer:
@@ -190,10 +200,6 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
 ## Credits
 
 - [centrex](https://github.com/centrex)
@@ -202,4 +208,4 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
