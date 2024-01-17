@@ -50,7 +50,7 @@ final class Wallet extends Model
     }
 
     /**
-     * @param $transaction WalletTransaction|integer|float|double
+     * @param  $transaction  WalletTransaction|integer|float|double
      *
      * @throws Exception
      */
@@ -77,7 +77,7 @@ final class Wallet extends Model
     }
 
     /**
-     * @param $transaction WalletTransaction|integer|float|double
+     * @param  $transaction  WalletTransaction|integer|float|double
      *
      * @throws Exception
      */
@@ -144,7 +144,7 @@ final class Wallet extends Model
     /**
      * Converts the given value to an integer that is compatible with this wallet's type.
      *
-     * @param int $value
+     * @param  int  $value
      * @return float|int
      */
     private function convertToWalletTypeInteger($value)
