@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 enum WalletType: int
 {
-    case DEFAULT  = 1;
+    case DEFAULT = 1;
     case TEMPORAY = 2;
 
     public function getName(): string
