@@ -30,5 +30,7 @@ trait HasWallet
         if ($walletType) {
             return $this->wallets()->where('wallet_type_id', $walletType)->first();
         }
+
+        return null;
     }
 }

@@ -4,6 +4,4 @@ declare(strict_types = 1);
 
 namespace Centrex\Wallet;
 
-final class Wallet
-{
-}
+final class Wallet {}

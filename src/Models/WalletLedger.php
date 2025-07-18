@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Centrex\Wallet\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class WalletLedger extends Model
 {

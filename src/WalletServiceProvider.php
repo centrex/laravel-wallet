@@ -56,6 +56,6 @@ final class WalletServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'wallet');
 
         // Register the main class to use with the facade
-        $this->app->singleton('wallet', fn (): \Centrex\Wallet\Wallet => new Wallet());
+        $this->app->singleton('wallet', fn (): Wallet => new Wallet());
     }
 }
