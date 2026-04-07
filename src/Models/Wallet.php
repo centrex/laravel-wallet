@@ -34,19 +34,14 @@ final class Wallet extends Model
         return $this->morphTo('user');
     }
 
-    public function walletType()
+    public function getWalletTypeAttribute(): ?WalletType
     {
-        return $this->belongsTo(WalletType::cases());
+        return WalletType::tryFrom((int) $this->wallet_type_id);
     }
 
     public function walletLedgers()
     {
         return $this->hasMany(WalletLedger::class);
-    }
-
-    public function getBalanceAttribute()
-    {
-        return $this->balance;
     }
 
     /**
@@ -85,7 +80,7 @@ final class Wallet extends Model
     {
         if (is_numeric($transaction)) {
             $amount = $this->convertToWalletTypeInteger($transaction);
-            $this->decrement('raw_balance', $amount);
+            $this->decrement('balance', $amount);
             $this->createWalletLedgerEntry($amount, $this->balance, 'decrement');
 
             return $this;
@@ -98,7 +93,7 @@ final class Wallet extends Model
         $this->decrement('balance', $transaction->getAmount());
 
         // Record in ledger
-        $this->createWalletLedgerEntry($transaction, $this->raw_balance, 'decrement');
+        $this->createWalletLedgerEntry($transaction, $this->balance, 'decrement');
 
         return $this;
     }
