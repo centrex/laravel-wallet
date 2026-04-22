@@ -13,6 +13,6 @@ final class Wallet extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Centrex\Wallet\Wallet::class;
+        return 'wallet';
     }
 }

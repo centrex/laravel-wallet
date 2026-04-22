@@ -6,5 +6,5 @@ namespace Centrex\Wallet\Contracts;
 
 interface WalletTransaction
 {
-    public function getAmount();
+    public function getAmount(): int|float|string;
 }

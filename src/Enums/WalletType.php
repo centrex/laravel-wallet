@@ -21,6 +21,11 @@ enum WalletType: int
         return $this->value;
     }
 
+    public function decimals(): int
+    {
+        return 4;
+    }
+
     public static function getLabel($value): ?string
     {
         foreach (self::cases() as $case) {
