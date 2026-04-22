@@ -17,16 +17,18 @@ return new class() extends Migration
     {
         Schema::create('wallets', function (Blueprint $table) {
             $table->id();
-            $table->uuid();
+            $table->uuid()->unique();
 
-            $table->string('name', 36)->default('default');
+            $table->string('name', 36)->default(config('wallet.default_name', 'default'));
             $table->decimal('balance', 12, 4)->default(0.00);
-            $table->tinyInteger('wallet_type_id')->default(1);
+            $table->tinyInteger('wallet_type_id')->default((int) config('wallet.default_wallet_type', 1))->index();
             $table->nullableMorphs('user');
-            $table->string('currency_code', 3)->default('BDT');
+            $table->string('currency_code', 3)->default(config('wallet.default_currency', 'BDT'));
 
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index(['user_type', 'user_id', 'wallet_type_id'], 'wallet_owner_type_index');
         });
     }
 

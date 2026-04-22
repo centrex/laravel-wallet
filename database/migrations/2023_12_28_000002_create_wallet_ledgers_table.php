@@ -16,14 +16,17 @@ return new class() extends Migration
      */
     public function up()
     {
-        Schema::create('wallet_ledgers', function (Blueprint $table) {
+        Schema::create(config('wallet.ledger_table', 'wallet_ledgers'), function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->nullableMorphs('transection');
-            $table->decimal('amount');
+            $table->nullableMorphs('transaction');
+            $table->decimal('amount', 12, 4);
+            $table->decimal('running_balance', 12, 4);
             $table->foreignIdFor(Wallet::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index(['wallet_id', 'date']);
         });
     }
 
@@ -32,6 +35,6 @@ return new class() extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('wallet_ledgers');
+        Schema::dropIfExists(config('wallet.ledger_table', 'wallet_ledgers'));
     }
 };

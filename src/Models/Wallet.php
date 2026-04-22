@@ -7,8 +7,11 @@ namespace Centrex\Wallet\Models;
 use Centrex\Wallet\Contracts\WalletTransaction;
 use Centrex\Wallet\Enums\WalletType;
 use Centrex\Wallet\Traits\{HasUuid, Trashed};
-use Exception;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Relations\{HasMany, MorphTo};
+use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
+use RuntimeException;
 
 final class Wallet extends Model
 {
@@ -16,20 +19,20 @@ final class Wallet extends Model
     use SoftDeletes;
     use Trashed;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'wallet_type_id',
         'balance',
         'user_id',
         'user_type',
+        'currency_code',
     ];
 
-    public function user()
+    protected $casts = [
+        'balance' => 'decimal:4',
+    ];
+
+    public function user(): MorphTo
     {
         return $this->morphTo('user');
     }
@@ -39,115 +42,84 @@ final class Wallet extends Model
         return WalletType::tryFrom((int) $this->wallet_type_id);
     }
 
-    public function walletLedgers()
+    public function walletLedgers(): HasMany
     {
         return $this->hasMany(WalletLedger::class);
     }
 
-    /**
-     * @param  $transaction  WalletTransaction|integer|float|double
-     *
-     * @throws Exception
-     */
-    public function incrementBalance($transaction): self
+    public function incrementBalance(WalletTransaction|int|float|string $transaction): self
     {
-        if (is_numeric($transaction)) {
-            $amount = $this->convertToWalletTypeInteger($transaction);
-            $this->increment('balance', $amount);
-            $this->createWalletLedgerEntry($amount, $this->balance);
+        return $this->applyBalanceDelta($transaction, 'increment');
+    }
+
+    public function decrementBalance(WalletTransaction|int|float|string $transaction): self
+    {
+        return $this->applyBalanceDelta($transaction, 'decrement');
+    }
+
+    public function hasSufficientBalance(int|float|string $amount): bool
+    {
+        return (float) $this->balance >= $this->normalizeAmount($amount);
+    }
+
+    private function applyBalanceDelta(WalletTransaction|int|float|string $transaction, string $direction): self
+    {
+        $amount = $this->extractAmount($transaction);
+
+        if ($amount <= 0) {
+            throw new InvalidArgumentException('Wallet amounts must be greater than zero.');
+        }
+
+        if ($direction === 'decrement'
+            && !config('wallet.allow_negative_balances', false)
+            && !$this->hasSufficientBalance($amount)) {
+            throw new RuntimeException('Insufficient wallet balance.');
+        }
+
+        return DB::transaction(function () use ($transaction, $direction, $amount): self {
+            /** @var self $wallet */
+            $wallet = self::query()->lockForUpdate()->findOrFail($this->getKey());
+            $signedAmount = $direction === 'decrement' ? -$amount : $amount;
+            $newBalance = $wallet->normalizeAmount(((float) $wallet->balance) + $signedAmount);
+
+            $wallet->forceFill(['balance' => $newBalance])->save();
+            $wallet->createWalletLedgerEntry($transaction, $signedAmount, $newBalance);
+
+            $this->forceFill(['balance' => $wallet->balance]);
 
             return $this;
-        }
-
-        if (!$transaction instanceof WalletTransaction) {
-            throw new Exception('Increment balance expects parameter to be a float or a WalletTransaction object.');
-        }
-
-        $this->increment('balance', $transaction->getAmount());
-
-        // Record in ledger
-        $this->createWalletLedgerEntry($transaction, $this->balance);
-
-        return $this;
+        });
     }
 
-    /**
-     * @param  $transaction  WalletTransaction|integer|float|double
-     *
-     * @throws Exception
-     */
-    public function decrementBalance($transaction): self
+    private function createWalletLedgerEntry(WalletTransaction|int|float|string $transaction, float $signedAmount, float $runningBalance): WalletLedger
     {
-        if (is_numeric($transaction)) {
-            $amount = $this->convertToWalletTypeInteger($transaction);
-            $this->decrement('balance', $amount);
-            $this->createWalletLedgerEntry($amount, $this->balance, 'decrement');
+        $payload = [
+            'date'            => now()->toDateString(),
+            'amount'          => $this->normalizeAmount($signedAmount),
+            'running_balance' => $this->normalizeAmount($runningBalance),
+        ];
 
-            return $this;
+        if ($transaction instanceof Model) {
+            $payload['transaction_id'] = $transaction->getKey();
+            $payload['transaction_type'] = $transaction->getMorphClass();
         }
 
-        if (!$transaction instanceof WalletTransaction) {
-            throw new Exception('Decrement balance expects parameter to be a number or a WalletTransaction object.');
-        }
-
-        $this->decrement('balance', $transaction->getAmount());
-
-        // Record in ledger
-        $this->createWalletLedgerEntry($transaction, $this->balance, 'decrement');
-
-        return $this;
+        return $this->walletLedgers()->create($payload);
     }
 
-    /**
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    private function createWalletLedgerEntry($transaction, $newRunningRawBalance, string $type = 'increment')
+    private function extractAmount(WalletTransaction|int|float|string $transaction): float
     {
-        if (is_numeric($transaction)) {
-            if ($type === 'decrement') {
-                $transaction = -$transaction;
-            }
+        $amount = $transaction instanceof WalletTransaction ? $transaction->getAmount() : $transaction;
 
-            return WalletLedger::query()->create([
-                'wallet_id'           => $this->id,
-                'amount'              => $transaction,
-                'running_raw_balance' => $newRunningRawBalance,
-            ]);
+        if (!is_numeric($amount)) {
+            throw new InvalidArgumentException('Wallet balance expects a numeric amount or a WalletTransaction object.');
         }
 
-        if (!$transaction instanceof WalletTransaction) {
-            throw new Exception('Wallet ledger entries expect first parameter to be numeric or a WalletTransaction instance');
-        }
-
-        $amount = $this->convertToWalletTypeInteger($transaction->getAmount());
-
-        if ($type === 'decrement') {
-            $amount = -$amount;
-        }
-
-        return WalletLedger::query()->create([
-            'wallet_id'           => $this->id,
-            'transaction_id'      => $transaction->id,
-            'transaction_type'    => $transaction::class,
-            'amount'              => $amount,
-            'running_raw_balance' => $newRunningRawBalance,
-        ]);
+        return $this->normalizeAmount((float) $amount);
     }
 
-    /**
-     * Converts the given value to an integer that is compatible with this wallet's type.
-     *
-     * @param  int  $value
-     * @return float|int
-     */
-    private function convertToWalletTypeInteger($value)
+    private function normalizeAmount(int|float|string $value): float
     {
-        if (empty($this->walletType) || $this->walletType->decimals === 0) {
-            return $value;
-        }
-
-        return (int) ($value * 10 ** $this->walletType->decimals);
+        return round((float) $value, $this->walletType?->decimals() ?? 4);
     }
 }
