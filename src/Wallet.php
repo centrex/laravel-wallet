@@ -20,8 +20,8 @@ final class Wallet
         return $owner->wallets()->firstOrCreate(
             ['wallet_type_id' => $walletType],
             [
-                'name' => config('wallet.default_name', 'default'),
-                'balance' => 0,
+                'name'          => config('wallet.default_name', 'default'),
+                'balance'       => 0,
                 'currency_code' => config('wallet.default_currency', 'BDT'),
             ],
         );

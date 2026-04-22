@@ -21,8 +21,8 @@ final class WalletLedger extends Model
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'amount' => 'decimal:4',
+        'date'            => 'date',
+        'amount'          => 'decimal:4',
         'running_balance' => 'decimal:4',
     ];
 

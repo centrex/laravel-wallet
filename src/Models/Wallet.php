@@ -94,8 +94,8 @@ final class Wallet extends Model
     private function createWalletLedgerEntry(WalletTransaction|int|float|string $transaction, float $signedAmount, float $runningBalance): WalletLedger
     {
         $payload = [
-            'date' => now()->toDateString(),
-            'amount' => $this->normalizeAmount($signedAmount),
+            'date'            => now()->toDateString(),
+            'amount'          => $this->normalizeAmount($signedAmount),
             'running_balance' => $this->normalizeAmount($runningBalance),
         ];
 

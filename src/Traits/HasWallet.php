@@ -21,9 +21,9 @@ trait HasWallet
             $model->wallets()->firstOrCreate(
                 ['wallet_type_id' => config('wallet.default_wallet_type', WalletType::DEFAULT->value)],
                 [
-                    'name' => config('wallet.default_name', 'default'),
+                    'name'          => config('wallet.default_name', 'default'),
                     'currency_code' => config('wallet.default_currency', 'BDT'),
-                    'balance' => 0,
+                    'balance'       => 0,
                 ],
             );
         });

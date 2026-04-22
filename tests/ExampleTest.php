@@ -2,8 +2,8 @@
 
 declare(strict_types = 1);
 
-use Centrex\Wallet\Wallet as WalletService;
 use Centrex\Wallet\Traits\HasWallet;
+use Centrex\Wallet\Wallet as WalletService;
 use Illuminate\Database\Eloquent\Model;
 
 it('creates a default wallet and records ledger entries for deposits and withdrawals', function (): void {
